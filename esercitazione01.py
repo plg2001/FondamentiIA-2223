@@ -15,7 +15,8 @@ def simple_reflex_action(x, y, x_max, y_max):
 # - state["x_max"] e state["y_max"] sono inizialmente None (ignoti)
 # - model è una funzione tale che model(state, action) "predice" la
 #   prossima posizione (x, y) dell'agente, assumendo che parta da
-#   state e segua l'azione action
+#   state e segua l'azione action (considerando anche i limiti della
+#   griglia)
 def update_state(state, last_action, x, y, model):
     state["x"], state["y"] = x, y
     # da completare: aggiornare state["x_max"] e state["y_max"]
@@ -36,8 +37,8 @@ es4_action_space = ["N", "S", "E", "W", "NE", "NW", "SE", "SW"]
 
 # Note:
 # - state è un dict che contiene:
-#   - la posizione dell'agente in "x", "y"
-#   - la posizione del goal: "x_max", "y_max"
+#   - la posizione dell'agente in "x" e "y"
+#   - la posizione del goal: "x_max" e "y_max"
 def utility(state):
     # da completare: assegnare un valore di utility a state
     return 0.
@@ -272,6 +273,7 @@ if __name__ == '__main__':
         omniscent=True,
         forbidden=["NE", "NW", "SE", "SW"]
     )
+    print(f'Running es 1...')
     run_env(env)
 
     agent = ModelBasedReflexAgent(model=None)
@@ -287,6 +289,7 @@ if __name__ == '__main__':
         forbidden=["NE", "NW", "SE", "SW"]
     )
     agent.model = env.model
+    print(f'Running es 2...')
     run_env(env)
 
     env = GridWorld(
@@ -307,4 +310,5 @@ if __name__ == '__main__':
         s1["y"] = y
         return s1
     env.agent = lambda x, y, x_max, y_max: utility_based_action({"x": x, "y": y, "x_max": x_max, "y_max": y_max}, m)
+    print(f'Running es 3...')
     run_env(env)
