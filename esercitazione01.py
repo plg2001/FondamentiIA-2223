@@ -1,5 +1,5 @@
 import pygame
-
+import math 
 
 # es 1: agente reattivo semplice
 def simple_reflex_action(x, y, x_max, y_max):
@@ -22,12 +22,15 @@ def simple_reflex_action(x, y, x_max, y_max):
 #   state e segua l'azione action (considerando anche i limiti della
 #   griglia)
 def update_state(state, last_action, x, y, model):
+    state["x"], state["y"] = x, y
     # da completare: aggiornare state["x_max"] e state["y_max"]
-
-    last_action = "S"
     
+    if last_action is not None and model(state,last_action) == (x,y):
+        if (state["x_max"] is None):
+            state["x_max"] = x
 
-    print(state["y"])
+        elif(state["y_max"] is None):
+            state["y_max"] = y
 
 def model_based_reflex_action(state):
     x, y = state["x"], state["y"]
@@ -35,11 +38,23 @@ def model_based_reflex_action(state):
     # da completare: ritornare l'azione da seguire
     # suggerimento: una volta che x_max e y_max sono noti, si possono
     # seguire le stesse azioni dell'es1
-    if (x_max != None and y_max != None):
-        return simple_reflex_action(x,y,x_max,y_max)
-    
 
+    #Voglio trovare x_max quindi vado a destra
+    if x_max is None:
+        return "E"
+
+    #Voglio trovare y_max quindi vado in basso
+    if y_max is None:
+        return "S"
     
+    #Questa parte in teoria non server,perche funziona comunque anche senza
+    if(x_max is not None and y_max is not None):
+        if (x < x_max):
+            return "E"
+    
+        if (y < y_max):
+            return "S"
+
     
 
 
@@ -53,7 +68,11 @@ es4_action_space = ["N", "S", "E", "W", "NE", "NW", "SE", "SW"]
 #   - la posizione del goal: "x_max" e "y_max"
 def utility(state):
     # da completare: assegnare un valore di utility a state
-    return 0.
+
+    #Definisco come utility la distanza tra (x,y) e (x_max,y_max)
+    e1 = (state["x"] - state["x_max"])**2
+    e2 = (state["y"] - state["y_max"])**2
+    return math.sqrt(e1 + e2)
 
 # Note:
 # - model è una funzione tale che model(state, action) ritorna un nuovo
@@ -63,9 +82,15 @@ def utility_based_action(state, model):
     # da completare: utilizzare model e la funzione utility definita
     # sopra per decidere l'azione migliore (i.e. che arriva in uno stato
     # a utility maggiore)
-    pass
+    
+    action_to_return = ''
+    for Action in es4_action_space:
+        next_state = model(state,Action)
+        if(utility(next_state) < utility(state)):
+            state = next_state
+            action_to_return = Action
 
-
+    return action_to_return
 
 
 
