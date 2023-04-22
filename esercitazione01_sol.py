@@ -2,15 +2,14 @@ import pygame
 
 
 # es 1: agente reattivo semplice
+
 def simple_reflex_action(x, y, x_max, y_max):
-    if (x < x_max):
+    # da completare: ritornare l'azione da seguire
+    if x < x_max:
         return "E"
-    
-    if (y < y_max):
+    if y < y_max:
         return "S"
 
-    
-    
 
 # es 2: agente reattivo model-based
 
@@ -22,12 +21,17 @@ def simple_reflex_action(x, y, x_max, y_max):
 #   state e segua l'azione action (considerando anche i limiti della
 #   griglia)
 def update_state(state, last_action, x, y, model):
+    state["x"], state["y"] = x, y
     # da completare: aggiornare state["x_max"] e state["y_max"]
-
-    last_action = "S"
-    
-
-    print(state["y"])
+    # se l'ultima azione doveva muovere l'agente ma non l'ha fatto
+    # (secondo il modello), allora abbiamo raggiunto un muro
+    if last_action is not None and model(state, last_action) == (x, y):
+        # se stavamo cercando x_max, allora il muro è quello destro
+        if state["x_max"] is None:
+            state["x_max"] = x
+        # se stavamo cercando y_max, allora il muro è quello in basso
+        elif state["y_max"] is None:
+            state["y_max"] = y
 
 def model_based_reflex_action(state):
     x, y = state["x"], state["y"]
@@ -35,12 +39,17 @@ def model_based_reflex_action(state):
     # da completare: ritornare l'azione da seguire
     # suggerimento: una volta che x_max e y_max sono noti, si possono
     # seguire le stesse azioni dell'es1
-    if (x_max != None and y_max != None):
-        return simple_reflex_action(x,y,x_max,y_max)
-    
-
-    
-    
+    # se x_max è ancora ignoto, vai a destra fino a che non viene scoperto
+    if x_max is None:
+        return "E"
+    # se y_max è ancora ignoto, vai in basso fino a che non viene scoperto
+    if y_max is None:
+        return "S"
+    else:
+        if x < x_max:
+            return "E"
+        if y < y_max:
+            return "S"
 
 
 # es 4: agente utility-based
@@ -53,7 +62,9 @@ es4_action_space = ["N", "S", "E", "W", "NE", "NW", "SE", "SW"]
 #   - la posizione del goal: "x_max" e "y_max"
 def utility(state):
     # da completare: assegnare un valore di utility a state
-    return 0.
+    # distanza euclidea (al quadrato), negata per la massimizzazione
+    return -((state["x"] - state["x_max"])**2 + (state["y"] - state["y_max"])**2)
+
 
 # Note:
 # - model è una funzione tale che model(state, action) ritorna un nuovo
@@ -63,7 +74,18 @@ def utility_based_action(state, model):
     # da completare: utilizzare model e la funzione utility definita
     # sopra per decidere l'azione migliore (i.e. che arriva in uno stato
     # a utility maggiore)
-    pass
+    a = None
+    max_u = None
+    # esamina ogni azione possibile e scegli quella che porta in uno
+    # stato a utility maggiore (i.e. distanza euclidea minore in questo
+    # caso)
+    for action in es4_action_space:
+        next_state = model(state, action)
+        u = utility(next_state)
+        if max_u is None or u > max_u:
+            max_u = u
+            a = action
+    return a
 
 
 
