@@ -2,11 +2,15 @@ import pygame
 
 
 # es 1: agente reattivo semplice
-
 def simple_reflex_action(x, y, x_max, y_max):
-    # da completare: ritornare l'azione da seguire
-    pass
+    if (x < x_max):
+        return "E"
+    
+    if (y < y_max):
+        return "S"
 
+    
+    
 
 # es 2: agente reattivo model-based
 
@@ -18,9 +22,12 @@ def simple_reflex_action(x, y, x_max, y_max):
 #   state e segua l'azione action (considerando anche i limiti della
 #   griglia)
 def update_state(state, last_action, x, y, model):
-    state["x"], state["y"] = x, y
     # da completare: aggiornare state["x_max"] e state["y_max"]
-    pass
+
+    last_action = "S"
+    
+
+    print(state["y"])
 
 def model_based_reflex_action(state):
     x, y = state["x"], state["y"]
@@ -28,7 +35,12 @@ def model_based_reflex_action(state):
     # da completare: ritornare l'azione da seguire
     # suggerimento: una volta che x_max e y_max sono noti, si possono
     # seguire le stesse azioni dell'es1
-    pass
+    if (x_max != None and y_max != None):
+        return simple_reflex_action(x,y,x_max,y_max)
+    
+
+    
+    
 
 
 # es 3: agente utility-based
