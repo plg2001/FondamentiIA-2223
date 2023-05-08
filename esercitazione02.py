@@ -45,12 +45,7 @@ class Node:
 # "depth_first_search" devono ritornare l'ultimo nodo della soluzione
 # (un oggetto di tipo Node).
 
-def breadth_first_search(
-    initial_state,
-    goal_test,
-    successor_fn,
-    cost_fn
-):
+def breadth_first_search(initial_state,goal_test,successor_fn,cost_fn):
     pass
 
 def uniform_cost_search(
