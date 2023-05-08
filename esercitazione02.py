@@ -1,5 +1,5 @@
 import pygame
-
+import queue
 
 class Node:
     def __init__(self, state, path_cost=0, action=None, parent=None):
@@ -46,8 +46,25 @@ class Node:
 # (un oggetto di tipo Node).
 
 def breadth_first_search(initial_state,goal_test,successor_fn,cost_fn):
-    pass
+    q = queue.Queue()
+    Initial_Node = Node(initial_state,path_cost=0,action=None)
+    q.put(Initial_Node)
+    
+    while not q.empty():
+        Nodo = q.get()
+        if(goal_test(Nodo.state) == True):
+            return Nodo
+        successor = successor_fn(Nodo.state)
+        for i in successor:
+            Succesor_Node = Node(i[1],path_cost=cost_fn(i[0]),action=i[0],parent=Nodo)
+            q.put(Succesor_Node)
+    
+    return None
 
+    
+
+
+    
 def uniform_cost_search(
     initial_state,
     goal_test,
