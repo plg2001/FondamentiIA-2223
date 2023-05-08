@@ -2,7 +2,6 @@ import pygame
 
 
 class Node:
-
     def __init__(self, state, path_cost=0, action=None, parent=None):
         self.state = state
         self.path_cost = path_cost
