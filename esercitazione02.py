@@ -1,6 +1,7 @@
 import pygame
 import queue
 
+
 class Node:
     def __init__(self, state, path_cost=0, action=None, parent=None):
         self.state = state
@@ -56,8 +57,54 @@ def breadth_first_search(initial_state,goal_test,successor_fn,cost_fn):
             return Nodo
         successor = successor_fn(Nodo.state)
         for i in successor:
-            Succesor_Node = Node(i[1],path_cost=cost_fn(i[0]),action=i[0],parent=Nodo)
-            q.put(Succesor_Node)
+            Successor_Node = Node(i[1],path_cost=cost_fn(i[0]) + Nodo.path_cost,action=i[0],parent=Nodo)
+            
+            q.put(Successor_Node)
+    
+    return None
+
+def findMin(q):
+    cost = q[0][1]
+    elem = None
+    for i in q:
+        if(cost >= i[1]):
+            elem = i
+    return elem
+        
+def uniform_cost_search(initial_state,goal_test,successor_fn,cost_fn,):
+    q = []
+    Initial_Node = Node(initial_state,path_cost=0,action=None)
+    q.append((Initial_Node,0))
+
+    while len(q) != 0:
+        elem = findMin(q)
+        q.remove(elem)
+        if(goal_test(elem[0].state) == True):
+            return elem[0]
+        successor = successor_fn(elem[0].state)
+        for i in successor:
+            Succesor_Node = Node(i[1],path_cost=cost_fn(i[0]) + elem[0].path_cost,action=i[0],parent=elem[0])
+            q.append((Succesor_Node,Succesor_Node.path_cost))
+    return None 
+
+
+def depth_first_search(initial_state,goal_test,successor_fn,cost_fn):
+    Scoperto = []
+    q = queue.Queue()
+    Initial_Node = Node(initial_state,path_cost=0,action=None)
+    Scoperto.append(Initial_Node)
+    q.put(Initial_Node)
+ 
+    while not q.empty():
+        Nodo = q.get()
+        Scoperto.append(Nodo)
+        if(goal_test(Nodo.state) == True):
+            return Nodo
+        successor = successor_fn(Nodo.state)
+        for i in successor:
+            Successor_Node = Node(i[1],path_cost=cost_fn(i[0]) + Nodo.path_cost,action=i[0],parent=Nodo)
+            if(Successor_Node not in Scoperto):
+                q.put(Successor_Node)
     
     return None
 
@@ -65,21 +112,7 @@ def breadth_first_search(initial_state,goal_test,successor_fn,cost_fn):
 
 
     
-def uniform_cost_search(
-    initial_state,
-    goal_test,
-    successor_fn,
-    cost_fn,
-):
-    pass
-
-def depth_first_search(
-    initial_state,
-    goal_test,
-    successor_fn,
-    cost_fn
-):
-    pass
+    
 
 
 # Implementation (grid world, rendering, main)
