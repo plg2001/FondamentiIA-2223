@@ -13,11 +13,25 @@ import random
 
 def fitness_fn(individual):
     """Implementare la funzione di fitness.
-
     Dato un individuo, ritornare il valore di fitness corrispondente
     (vedi slides).
     """
-    pass
+    n = len(individual)
+    coppie_totali = n*(n-1)/2
+    coppie_cattive = 0
+
+    for i in range(0,n):
+        for j in range(i+1,n):
+            if(individual[i] == individual[j]):
+                 coppie_cattive +=1
+            if((abs(individual[i] - individual[j]) == abs(i-j)) or (abs(individual[i]+ individual[j]) == abs(i+j))):
+                coppie_cattive +=1
+    
+    
+                
+    return coppie_totali - coppie_cattive
+    
+
 
 def roulette_wheel_selection(population, fitnesses, k):
     """Implementare la fase di selezione dei genitori.
@@ -29,7 +43,27 @@ def roulette_wheel_selection(population, fitnesses, k):
     ritornare una lista di k individui, estratti a caso dalla
     popolazione con probabilità proporzionale al loro valore di fitness.
     """
-    pass
+
+    parents = []
+    fitness_sum = sum(fitnesses)
+
+    for i in range(k):
+        # Seleziona un numero casuale compreso tra 0 e la somma dei valori di fitness
+        selection = random.uniform(0, fitness_sum)
+
+        # Itera sui candidati fino a trovare quello selezionato
+        fitness_cumulative = 0
+        for j in range(len(population)):
+            fitness_cumulative += fitnesses[j]
+            if fitness_cumulative > selection:
+                # Aggiungi il candidato selezionato alla lista dei genitori
+                parents.append(population[j])
+                break
+
+    return parents
+
+    
+
 
 def mutation(individual, rate):
     """Implementare la fase di mutazione.
@@ -40,7 +74,17 @@ def mutation(individual, rate):
     ricorda che, in python, data una lista l se ne può ottenere una
     copia con l.copy().
     """
-    pass
+    # Crea una copia dell'individuo
+    mutated_individual = individual.copy()
+
+    # Applica l'eventuale mutazione a ciascun gene
+    for i in range(len(mutated_individual)):
+        if random.random() < rate:
+            # Se il valore generato casualmente è minore della probabilità di mutazione, muta il gene
+            mutated_individual[i] = random.choice(range(1, len(mutated_individual) + 1))
+
+    return mutated_individual
+
 
 def crossover(p, q):
     """Implementare la fase di crossover.
@@ -49,7 +93,20 @@ def crossover(p, q):
     individui figli che siano il risultato del crossover tra p e q
     (vedi slides).
     """
-    pass
+    # Crea due nuovi individui figli inizialmente vuoti
+    child1 = []
+    child2 = []
+
+    # Scegli casualmente il punto di crossover
+    n = len(p)
+    cross_point = random.randint(0, n-1)
+
+    # Genera i due figli attraverso il crossover
+    child1 = p[:cross_point] + q[cross_point:]
+    child2 = q[:cross_point] + p[cross_point:]
+
+    print(child1,child2)
+    return (child1, child2)
 
 # Esercizio 2
 
