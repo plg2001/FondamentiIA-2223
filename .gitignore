@@ -1,8 +1,8 @@
 .vscode/
 # *_sol.md
-*02_sol.*
-03_sol.*
-*05_sol.*
+*02_sol*
+03_sol*
+*05_sol*
 untracked/
 
 # Byte-compiled / optimized / DLL files
