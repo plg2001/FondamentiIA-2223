@@ -1,7 +1,7 @@
 import random
 import pygame
 from itertools import product
-
+import numpy as np
 import matplotlib.pyplot as plt
 
 
@@ -15,17 +15,7 @@ import matplotlib.pyplot as plt
 #   dove w e h sono le dimensioni della griglia.
 
 
-def value_iteration(
-    width,
-    height,
-    num_actions,
-    transition_probabilities,
-    rewards,
-    end_state,
-    max_steps,
-    gamma,
-    iterations
-):
+def value_iteration(width,height,num_actions,transition_probabilities,rewards,end_state,max_steps,gamma,iterations):
     """Implementare Value Iteration.
 
     Parametri:
@@ -50,22 +40,32 @@ def value_iteration(
     # Initialize V*(s) to 0 for all s and pi*(s) to any action (0 in this case).
     values = {s: 0.0 for s in product(range(width), range(height))}
     best_actions = {s: 0 for s in product(range(width), range(height))}
+
+    #La chive del transition_probabilities è una coppia del tipo (s,a) con 's' stato iniziale e 'a',l'azione che esegue
+    #Il valore della chiave è una altro dizionario dove ogni chiave è uno stato 's' e il valore è la probabilitò di arrivare a quello stato
+    #Quindi transition_probabilities dice per ogni stato 's' quale è la probabilita di arrivare a uno stato 's1' fancendo l'azione 'a'
+
     
     # TODO completare
+    
+    for i in range(iterations):
+        for s in product(range(width), range(height)):
+            if(s == end_state):
+                values[s] = rewards[end_state]
+                continue
 
+            for a in range(num_actions):
+                v_max = 0
+                for s1 in product(range(width), range(height)):
+                    if(s1 != s):
+                        v_max += transition_probabilities[(s),a][s1] * (rewards[s1] + gamma*values[s1])
+                if(values[s] <= v_max):
+                    values[s] = v_max
+                    best_actions[s] = a
+                
     return values, best_actions
 
-def q_learning(
-    width,
-    height, 
-    num_actions,
-    alpha,
-    gamma,
-    initial_epsilon,
-    epsilon_decay,
-    episodes,
-    eval_ql_policy,
-):
+def q_learning(width,height, num_actions,alpha,gamma,initial_epsilon,epsilon_decay,episodes,eval_ql_policy):
     """Implementare Q-Learning.
 
     Parametri:
@@ -97,11 +97,106 @@ def q_learning(
     eps = initial_epsilon
     received_first_reward = False
 
-    # TODO completare
 
+    max_step = 10
+
+    # TODO completare
+    for episode in range(episodes):
+        # Inizializza lo stato
+        state = (0,0)
+
+        # Variabili per il calcolo del reward cumulativo
+        total_reward = 0
+
+        # Ciclo degli step all'interno dell'episodio
+        for i in range(max_step):
+            # Scegli un'azione epsilon-greedy
+            action = epsilon_greedy_policy(q_table, initial_epsilon,num_actions)
+
+            # Esegui l'azione e ottieni il reward e lo stato successivo
+            next_state, reward = execute_action(width,height,state, action)
+
+            # Aggiorna la Q-table
+            for a in range(num_actions):
+                q_table[state, action] += alpha * (reward + gamma * np.max(q_table[next_state,a]) - q_table[(state),action])
+
+            # Aggiorna il reward cumulativo
+            total_reward += reward
+
+            # Aggiorna lo stato corrente al prossimo stato
+            state = next_state
+
+        # Aggiorna l'epsilon dopo il primo episodio con reward non nullo
+        
+        initial_epsilon *= epsilon_decay
+
+        # Valuta la policy dopo ogni episodio di training
+        eval_reward = eval_ql_policy(q_table)
+        evals.append(eval_reward)
+
+    
     return q_table, evals
 
+def execute_action(width,height,state, action):
+    # Esegui l'azione e ottieni il reward e lo stato successivo
+    # Implementa la logica specifica del tuo ambiente o problema
+    # Restituisci il prossimo stato e il reward ottenuto
+    next_state = get_next_state(width,height,state, action)
+    reward = get_reward(action)
+    return next_state, reward
 
+def get_next_state(width,height,state,action):
+    next_state = state
+    if action == 0:  # Azione "sinistra"
+        if(state[0] - 1 >= 0):
+            next_state = (state[0] - 1,state[1])  
+
+    elif action == 1:  # Azione "sopra"
+        if(state[1] - 1 >= 0):
+            next_state = (state[0], state[1] - 1)
+
+    elif action == 2:  # Azione "destra"
+        if(state[0] + 1 < width ):
+            next_state = (state[0] + 1, state[1])
+            
+    elif action == 3:  # Azione "giu"
+        if(state[1] + 1 < height):
+            next_state = (state[0], state[1]  + 1)
+    else:
+        raise ValueError("Azione non valida")
+    
+    return next_state
+
+def get_reward(action):
+    reward = 0
+    if(action == 0):
+        reward -= 10
+
+    elif(action == 1):
+        reward -= 10
+
+    elif(action == 2):
+        reward +=  100
+        
+    elif(action == 3):
+        reward += 10
+
+    return reward
+    
+    
+
+def epsilon_greedy_policy(q_table,epsilon,num_actions):
+    if random.random() < epsilon:
+        # Azione casuale (esplorazione)
+        action = random.randint(0, num_actions -1)
+    else:
+        # Azione greedy (sfruttamento)
+        q_max = 0
+        for chiave,valore in q_table.items():
+            if(valore >= q_max):
+                q_max = valore
+                action = chiave[1]
+    return action
 
 
 # Implementation (grid world, rendering, main)
