@@ -158,7 +158,7 @@ def get_next_state(width,height,state,action):
     elif action == 2:  # Azione "destra"
         if(state[0] + 1 < width ):
             next_state = (state[0] + 1, state[1])
-            
+
     elif action == 3:  # Azione "giu"
         if(state[1] + 1 < height):
             next_state = (state[0], state[1]  + 1)
@@ -179,7 +179,7 @@ def get_reward(action):
         reward +=  100
         
     elif(action == 3):
-        reward += 10
+        reward += 90
 
     return reward
     
